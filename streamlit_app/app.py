@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import MultiLabelBinarizer
+import geopandas as gpd
 import io
 
 sns.set(style="whitegrid")
@@ -16,8 +17,8 @@ def load_data(path=None, uploaded_file=None):
     if uploaded_file is not None:
         return pd.read_csv(uploaded_file)
     if path is not None:
-        # return pd.read_csv(path)
-        return pd.read_csv("../data/india_housing_prices.csv")
+        return pd.read_csv(path)
+        # return pd.read_csv("data/india_housing_prices.csv")
     raise ValueError("Provide a path or upload a file.")
 
 def prepare_amenities(df):
@@ -126,6 +127,62 @@ def correlation_overview(df):
     else:
         st.write("Not enough numeric columns for correlation heatmap.")
 
+def location_analysis(df):
+    st.subheader("Average Price per Sq. Ft by State")
+    if "State" in df.columns:
+        state_price = df.groupby("State")["Price_per_SqFt"].mean().sort_values(ascending=False)
+        plt.figure(figsize=(10,6))
+        sns.barplot(x=state_price.index, y=state_price.values)
+        plt.xticks(rotation=45)
+        plt.ylabel("Average Price per SqFt")
+        plt.title("Average Price per SqFt by State")
+        st.pyplot(plt.gcf())
+        plt.clf()
+    else:
+        st.info("No 'State' column found in dataset.")
+
+def state_map_visualization(df):
+    st.subheader("State-wise Price Distribution Map")
+    import json
+    # Compute state-level average price per sq ft
+    state_avg = df.groupby("State", as_index=False)["Price_per_SqFt"].mean()
+    state_avg.rename(columns={"Price_per_SqFt":"Avg_PPFS"}, inplace=True)
+
+    # Load location data
+    india_geo = gpd.read_file("data/gadm41_IND_2.json")
+    # Fix
+    df["State"] = df["State"].replace({
+        "Andhra Pradesh" : "AndhraPradesh",
+        "Delhi" : "NCTofDelhi",
+        "Madhya Pradesh" : "MadhyaPradesh",
+        "Tamil Nadu" : "TamilNadu",
+        "Uttar Pradesh" : "UttarPradesh",
+        "West Bengal" : "WestBengal"
+    })
+
+    # Merge the averages into the GeoDataFrame
+    india_geo_merged = india_geo.merge(state_avg, left_on="NAME_1", right_on="State", how="left")
+    india_geo_merged[['NAME_1','NAME_2', 'Avg_PPFS']].head(10)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    india_geo_merged.plot(
+        column="Avg_PPFS",
+        cmap="YlOrRd",
+        linewidth=0.3,
+        edgecolor="black",
+        legend=True,
+        ax=ax,
+        missing_kwds={"color": "lightgrey", "label": "No data"}
+    )
+
+    ax.set_title("Average Price per SqFt (Rs. thousands) by State", fontsize=14)
+    ax.axis("off")
+
+    plt.tight_layout()
+    st.pyplot(fig)
+    plt.clf()
+
 # --- UI ---
 st.title("Real Estate EDA")
 st.write("Interactive EDA. Upload a CSV or use the default dataset path.")
@@ -136,7 +193,7 @@ use_uploaded = st.sidebar.checkbox("Upload CSV instead of default file", value=F
 uploaded_file = None
 if use_uploaded:
     uploaded_file = st.sidebar.file_uploader("Upload your india_housing_prices.csv", type=["csv"])
-data_path = st.sidebar.text_input("Or enter dataset path", value="../data/india_housing_prices.csv")
+data_path = st.sidebar.text_input("Or enter dataset path", value="data/india_housing_prices.csv")
 
 if use_uploaded:
     if uploaded_file is None:
@@ -146,7 +203,7 @@ if use_uploaded:
 else:
     try:
         # df = load_data(path=data_path)
-        df = load_data("../data/india_housing_prices.csv")
+        df = load_data("data/india_housing_prices.csv")
     except Exception as e:
         st.error(f"Failed to load dataset from {data_path}: {e}")
         st.stop()
@@ -165,7 +222,7 @@ if "Price_per_SqFt" not in df.columns and "Price_in_Lakhs" in df.columns and "Si
 df, amenity_cols = prepare_amenities(df)
 
 # Main layout: tabs
-tabs = st.tabs(["Overview", "Price & Size", "Age vs Price", "Amenities", "Correlations", "Data"])
+tabs = st.tabs(["Overview", "Price & Size", "Age vs Price", "Amenities", "Correlations", "Location", "Data"])
 
 with tabs[0]:
     st.header("Dataset Overview")
@@ -230,6 +287,12 @@ with tabs[4]:
     plot_correlation_heatmap(df, amenity_cols)
 
 with tabs[5]:
+    st.header("Location Analysis")
+    location_analysis(df)
+    st.subheader("Price distribution by State")
+    state_map_visualization(df)
+
+with tabs[6]:
     st.header("Data")
     st.write("Preview and download cleaned data")
     st.dataframe(df.head(200))
@@ -238,5 +301,5 @@ with tabs[5]:
     st.download_button("Download cleaned CSV", data=buf.getvalue(), file_name="cleaned_india_housing_prices.csv", mime="text/csv")
 
 st.sidebar.markdown("---")
-st.sidebar.write("App converts your EDA notebook into interactive visualizations.")
 st.sidebar.write("Reference: project description used for guidance.")
+st.sidebar.write("Reference: https://docs.streamlit.io/")
