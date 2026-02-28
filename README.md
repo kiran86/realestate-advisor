@@ -1,10 +1,13 @@
-# RealEstate Advisor 🚀
+# RealEstate Advisor
 
 A Python-based data exploration and visualization project focused on Indian housing prices. This repository provides tools and a Streamlit application to analyze real estate trends, perform exploratory data analysis, and offer insights for potential buyers or investors.
 
+> **Live app:** [https://realestate-advisor.streamlit.app/](https://realestate-advisor.streamlit.app/) (deployed on Streamlit Cloud)
+
+
 ---
 
-## 🗂️ Repository Structure
+## Repository Structure
 
 ```
 README.md
@@ -20,7 +23,7 @@ streamlit_app/
 
 ---
 
-## 🔍 Features
+## Features
 
 - Interactive exploratory data analysis using Jupyter Notebook
 - Visualizations of price distributions, trends, and geographic patterns
@@ -29,7 +32,7 @@ streamlit_app/
 
 ---
 
-## ⚙️ Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -59,7 +62,7 @@ Ensure you have Python 3.8+ installed.
 
 ---
 
-## 🧪 Usage
+## Usage
 
 ### Exploratory Notebook
 
@@ -79,7 +82,7 @@ The app provides a web interface to filter and visualize housing price data by r
 
 ---
 
-## 📁 Data Sources
+## Data Sources
 
 - `india_housing_prices.csv`: Publicly available dataset (ensure proper attribution if reused)
 - `gadm41_IND_2.json`: GADM level‑2 boundaries for India used for mapping
@@ -88,7 +91,7 @@ The app provides a web interface to filter and visualize housing price data by r
 
 ---
 
-## 🛠️ Development
+## Development
 
 - Add new analyses or visualizations in the notebook
 - Extend the Streamlit app with additional filters or charts
@@ -116,13 +119,13 @@ If `geopandas` or other geo packages cause installation issues on Streamlit Clou
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to open a pull request or contact the project owner.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
