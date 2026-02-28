@@ -9,3 +9,4 @@ shapely>=1.8
 pyproj>=3.0
 fiona>=1.8
 scikit-learn>=1.0
+seaborn>=0.12
