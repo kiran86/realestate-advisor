@@ -98,6 +98,24 @@ For code contributions, follow standard GitHub workflows with branches and pull 
 
 ---
 
+## **Deploying to Streamlit Cloud**
+
+- **Repository:** Push your repository to GitHub (the `main` branch is fine).
+- **Entry point:** When you create the app on Streamlit Cloud, set the Python file to `streamlit_app/app.py`.
+- **Dependencies:** Streamlit Cloud installs dependencies from `requirements.txt` automatically. Ensure `requirements.txt` is present at the repository root (included in this repo).
+- **Create the app:** Go to https://share.streamlit.io, connect your GitHub account, select the `kiran86/realestate-advisor` repo and the `main` branch, then set the app path to `streamlit_app/app.py`.
+- **Advanced settings:** Add any environment secrets via the Streamlit Cloud dashboard (for API keys or private credentials).
+
+Quick checklist:
+
+- **Push changes:** `git add . && git commit -m "Add Streamlit Cloud support" && git push`
+- **Select repo & branch:** use the Streamlit Cloud UI to point to `streamlit_app/app.py`.
+- **Wait for build:** Streamlit Cloud will install packages and launch the app; monitor logs for dependency issues.
+
+If `geopandas` or other geo packages cause installation issues on Streamlit Cloud, consider pre-processing geo files into plain GeoJSON and using `folium` or `pydeck` to visualize them.
+
+---
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to open a pull request or contact the project owner.
